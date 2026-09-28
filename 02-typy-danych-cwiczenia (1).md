@@ -242,10 +242,10 @@ Wypełnij:
 
 | a | b | `a AND b` | `a OR b` | `NOT a` | `a XOR b` | `NOT (a AND b)` |
 |---|---|---|---|---|---|---|
-| F | F | | | | | |
-| F | T | | | | | |
-| T | F | | | | | |
-| T | T | | | | | |
+| F | F | F | F | T | F | T |
+| F | T | F | T | T | T | T |
+| T | F | F | T | F | T | T |
+| T | T | T | T | F | F | F |
 
 ### Ćwiczenie 4.2 – Skrócone obliczanie
 
@@ -257,16 +257,20 @@ if (lista != null && lista.size() > 0) { ... }
 **b)** Co się stanie po zamianie warunków miejscami?
 **c)** Zapisz analogiczny warunek z operatorem `||`.
 
+**a)** Zadziała poprawnie.
+**b)** Wystąpi błąd.
+**c)** if (lista == null || lista.size() == 0)
+
 ### Ćwiczenie 4.3 – Kody znaków
 
 Uzupełnij, korzystając z tego, że `'A'` = 65, `'a'` = 97, `'0'` = 48:
 
 ```
-a)  kod znaku 'D'          = ______
-b)  kod znaku 'z'          = ______
-c)  znak o kodzie 74       = ______
-d)  '7' - '0'              = ______
-e)  (char)('a' - 32)       = ______
+a)  kod znaku 'D'          = 68
+b)  kod znaku 'z'          = 122
+c)  znak o kodzie 74       = 'J'
+d)  '7' - '0'              = -7
+e)  (char)('a' - 32)       = 'A'
 ```
 
 ### Ćwiczenie 4.4 – Zamiana wielkości liter
@@ -278,12 +282,12 @@ Napisz w pseudokodzie funkcję, która zamienia wielką literę na małą, korzy
 Rozstrzygnij, czy zdanie jest prawdziwe (P) czy fałszywe (F):
 
 ```
-a)  ASCII koduje znaki na 8 bitach.                          ___
-b)  Unicode to sposób zapisu znaków w bajtach.               ___
-c)  UTF-8 jest zgodne wstecz z ASCII.                        ___
-d)  W UTF-8 każdy znak zajmuje dokładnie 2 bajty.            ___
-e)  U+0041 to punkt kodowy litery A.                         ___
-f)  Emoji nie da się zapisać w UTF-8.                        ___
+a)  ASCII koduje znaki na 8 bitach.                 F   ASCII koduje znaki na 7 bitach.
+b)  Unicode to sposób zapisu znaków w bajtach.      F   Unicode to zestaw znaków przypisujący im numery, a sposobem ich zapisu w bajtach jest kodowanie (np. UTF-8).
+c)  UTF-8 jest zgodne wstecz z ASCII.               P
+d)  W UTF-8 każdy znak zajmuje dokładnie 2 bajty.   F   W UTF-8 znaki zajmują zmienną liczbę bajtów (od 1 do 4 bajtów, w zależności od znaku).
+e)  U+0041 to punkt kodowy litery A.                P
+f)  Emoji nie da się zapisać w UTF-8.               F   Emoji da się zapisać w UTF-8 (zajmują wtedy zazwyczaj 4 bajty).
 ```
 
 Popraw zdania fałszywe.
@@ -296,6 +300,10 @@ Uczeń zapisał plik w kodowaniu Windows-1250, a otworzył go w edytorze ustawio
 **b)** Czy dane w pliku zostały uszkodzone? Uzasadnij.
 **c)** Wymień trzy miejsca w projekcie webowym, w których trzeba ustawić kodowanie.
 
+**a)** To zjawisko nazywa się mojibake.
+**b)** Nie, dane w pliku nie zostały uszkodzone.
+**c)** Kod źródłowy plików, Nagłówek sekcji <head> w dokumencie HTML, Baza danych.
+
 ### Ćwiczenie 4.7 [K] – Bajty w praktyce
 
 ```python
@@ -307,9 +315,9 @@ Wypełnij tabelę i wyjaśnij różnice.
 
 | Tekst | Liczba znaków | Liczba bajtów |
 |---|---|---|
-| `Ala` | | |
-| `Zażółć` | | |
-| `cześć 😀` | | |
+| `Ala` | 3 | 3 |
+| `Zażółć` | 6 | 10 |
+| `cześć 😀` | 7 | 12 |
 
 ---
 
