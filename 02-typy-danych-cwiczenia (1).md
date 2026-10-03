@@ -32,19 +32,19 @@ Dla każdego typu wypełnij tabelę.
 
 | Typ | Przykładowe wartości | Dozwolone operacje | Rozmiar w pamięci |
 |---|---|---|---|
-| `bool` | | | |
-| `int32` | | | |
-| `char` | | | |
+| `bool` | 	true, false | Logiczne | 1 bajt |
+| `int32` | -2147483648, 0, 42 | Arytmetyczne, porównania, bitowe | 4 bajty |
+| `char` | 'a', 'Z', '9', '\n' | Porównania, przypisanie, inkrementacja | 1 lub 2 bajty |
 
 ### Ćwiczenie 1.2 – Statyczne czy dynamiczne
 
 Przy każdym fragmencie napisz, czy język stosuje typowanie **statyczne** czy **dynamiczne**, i uzasadnij jednym zdaniem.
 
 ```
-a)  int x = 5;  x = "tekst";      → błąd przy kompilacji
-b)  x = 5;      x = "tekst"       → działa poprawnie
-c)  auto y = 3.14;                → y jest typu double
-d)  let z = 10; z = "dziesięć";   → działa w JavaScripcie
+a)  int x = 5;  x = "tekst";      → błąd przy kompilacji   Statyczne - ponieważ typ zmiennej jest sprawdzany w trakcie kompilacji i nie można przypisać wartości tekstowej do zmiennej liczbowej
+b)  x = 5;      x = "tekst"       → działa poprawnie       Dynamiczne - ponieważ zmienna nie ma sztywnego typu i może swobodnie zmieniać go w trakcie działania programu.
+c)  auto y = 3.14;                → y jest typu double     Statyczne - ponieważ kompilator automatycznie dopasowuje stały typ na podstawie przypisanej wartości przed uruchomieniem programu.
+d)  let z = 10; z = "dziesięć";   → działa w JavaScripcie  Dynamiczne - ponieważ JavaScript określa typy wartości w czasie wykonywania kodu, co pozwala na zmianę typu zmiennej z.
 ```
 
 ### Ćwiczenie 1.3 – Silne czy słabe
@@ -53,24 +53,27 @@ Rozstrzygnij, co zwróci każde wyrażenie. Jeśli będzie to błąd – napisz 
 
 | Wyrażenie | Python | JavaScript |
 |---|---|---|
-| `"5" + 3` | | |
-| `"5" * 2` | | |
-| `"10" - 5` | | |
-| `True + 1` | | |
+| `"5" + 3` | błąd | "53" |
+| `"5" * 2` | "55" | 10 |
+| `"10" - 5` | błąd | 5 |
+| `True + 1` | 2 | 2 |
 
 ### Ćwiczenie 1.4 – Konwersje
 
 Podaj wynik każdej konwersji.
 
 ```
-a)  (int) 7.99            = ______
-b)  (int) -7.99           = ______
-c)  (double) 5            = ______
-d)  (int) 3.5 + (int) 3.5 = ______
-e)  (int)(3.5 + 3.5)      = ______
+a)  (int) 7.99            = 7
+b)  (int) -7.99           = -7
+c)  (double) 5            = 5.0
+d)  (int) 3.5 + (int) 3.5 = 6
+e)  (int)(3.5 + 3.5)      = 7
 ```
 
 Wyjaśnij, dlaczego wyniki `d` i `e` się różnią.
+
+D - W przykładzie d rzutowanie wykonuje się przed dodawaniem: liczby 3.5 są skracane do 3, co daje wynik 3 + 3 = 6.
+E - W przykładzie e nawias wymusza najpierw dodawanie: 3.5 + 3.5 daje 7.0, co po rzutowaniu na typ całkowity daje 7.
 
 ### Ćwiczenie 1.5 [K] – Sprawdź w konsoli
 
@@ -84,6 +87,8 @@ print(int("42abc"))
 
 Zapisz, jaki wyjątek zwraca ostatnia linia i co on oznacza.
 
+Wyjątek ValueError oznacza, że funkcja otrzymała argument o właściwym typie (w tym przypadku napis/string), ale o niepoprawnej wartości, której nie da się przekształcić na liczbę całkowitą. Funkcja int() potrafi przetłumaczyć na system dziesiętny tylko te teksty, które składają się wyłącznie z cyfr (i opcjonalnie znaku plus/minus). Litery "abc" uniemożliwiają wykonanie tej konwersji.
+
 ---
 
 # Lekcja 2. Typy liczbowe stałoprzecinkowe
@@ -94,26 +99,26 @@ Uzupełnij tabelę. Wartości zapisz w postaci liczbowej, nie wzorem.
 
 | Liczba bitów | Liczba wartości | Zakres bez znaku | Zakres ze znakiem |
 |---|---|---|---|
-| 4 | | | |
-| 8 | | | |
-| 16 | | | |
+| 4 | 16 | od 0 do 15| 0d -8 do 7 |
+| 8 | 256 | od 0 do 255 | od -128 do 127 |
+| 16 | 65536 | od 0 do 65535 | od -32768 do 32767 |
 
 ### Ćwiczenie 2.2 – Konwersja dwójkowo-dziesiętna
 
 Zamień na system dziesiętny (liczby bez znaku):
 
 ```
-a)  0000 1111  = ______
-b)  1000 0000  = ______
-c)  1111 1111  = ______
+a)  0000 1111  = 15
+b)  1000 0000  = 128
+c)  1111 1111  = 255
 ```
 
 A teraz te same bajty odczytane jako liczby **ze znakiem** w kodzie U2:
 
 ```
-a)  0000 1111  = ______
-b)  1000 0000  = ______
-c)  1111 1111  = ______
+a)  0000 1111  = 15
+b)  1000 0000  = -128
+c)  1111 1111  = -1
 ```
 
 ### Ćwiczenie 2.3 – Przepełnienie
@@ -121,20 +126,22 @@ c)  1111 1111  = ______
 Zmienna typu `int8` (zakres −128 … 127) ma wartość 120. Program dodaje do niej 10 w pętli. Wypisz kolejne wartości:
 
 ```
-120 → ______ → ______ → ______
+120 → 130 (błąd przepełnienia, czyli -126) → -116 → -106
 ```
 
 Po ilu krokach wartość stanie się ujemna?
+
+Wartość stanie się ujemna już po 1 kroku.
 
 ### Ćwiczenie 2.4 – Dzielenie całkowite
 
 Podaj wyniki:
 
 ```
-a)  17 / 5    (liczby całkowite)  = ______
-b)  17 % 5                        = ______
-c)  -17 / 5   (liczby całkowite)  = ______
-d)  Ile stron po 20 rekordów potrzeba na 143 rekordy?  = ______
+a)  17 / 5    (liczby całkowite)  = 17 / 5 = 3
+b)  17 % 5                        = 17 % 5 = 2
+c)  -17 / 5   (liczby całkowite)  = -17 / 5 = -3
+d)  Ile stron po 20 rekordów potrzeba na 143 rekordy?  = 8
 ```
 
 Zapisz wzór ogólny na liczbę stron przy `n` rekordach i `k` rekordach na stronie.
