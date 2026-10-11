@@ -31,11 +31,13 @@ Klucz odpowiedzi znajduje się na końcu pliku.
 Dla tablicy `int tab[8]` odpowiedz:
 
 ```
-a)  indeks pierwszego elementu       = ______
-b)  indeks ostatniego elementu       = ______
-c)  liczba elementów                 = ______
-d)  poprawny warunek pętli po całej tablicy:  for (i = 0; i ____ 8; i++)
+a)  indeks pierwszego elementu       = 0
+b)  indeks ostatniego elementu       = 7
+c)  liczba elementów                 = 8
+d)  poprawny warunek pętli po całej tablicy:  for (i = 0; i < 8; i++)
 e)  co się stanie przy odwołaniu tab[8] w Javie?  w C?
+- W Javie: Program natychmiast przerwie działanie i zgłosi błąd (wyjątek) ArrayIndexOutOfBoundsException. Java pilnuje bezpiecznego dostępu do pamięci.
+- W C: Dojdzie do tzw. nieokreślonego zachowania (Undefined Behavior). Język C nie sprawdza granic tablicy. Program spróbuje odczytać lub zapisać dane w losowym miejscu w pamięci (tuż za tablicą), co może spowodować błędne wyniki, naruszenie segmentacji (Crash programu) lub luki w bezpieczeństwie.
 ```
 
 ### Ćwiczenie 1.2 – Adresy w pamięci
@@ -45,9 +47,9 @@ Tablica `int tab[6]` zaczyna się pod adresem 2000, a typ `int` zajmuje 4 bajty.
 | Element | Adres |
 |---|---|
 | `tab[0]` | 2000 |
-| `tab[1]` | |
-| `tab[3]` | |
-| `tab[5]` | |
+| `tab[1]` | 2004 (2000 + 1 * 4) |
+| `tab[3]` | 2012 (2000 + 3 * 4) |
+| `tab[5]` | 2020 (2000 + 5 * 4) |
 
 Zapisz wzór ogólny na adres elementu o indeksie `i`. Ile bajtów zajmuje cała tablica?
 
@@ -56,20 +58,49 @@ Zapisz wzór ogólny na adres elementu o indeksie `i`. Ile bajtów zajmuje cała
 Napisz w pseudokodzie lub w Pythonie:
 
 **a)** funkcję liczącą średnią arytmetyczną elementów tablicy,
+def oblicz_srednia(tab):
+    if len(tab) == 0:
+        return 0
+    suma = 0
+    for element in tab:
+        suma += element 
+    return suma / len(tab)
+    
 **b)** funkcję zwracającą indeks wartości najmniejszej,
+def indeks_najmniejszego(tab):
+    if len(tab) == 0:
+        return -1
+    indeks_min = 0
+    for i in range(1, len(tab)):
+        if tab[i] < tab[indeks_min]:
+            indeks_min = i     
+    return indeks_min
+    
 **c)** funkcję zliczającą, ile elementów jest większych od podanej wartości.
-
+def zlicz_wieksze(tab, wartosc_progowa):
+    licznik = 0
+    for element in tab:
+        if element > wartosc_progowa:
+            licznik += 1   
+    return licznik
+    
 ### Ćwiczenie 1.4 – Znajdź błąd
 
 Każdy fragment zawiera jeden błąd. Wskaż go i popraw.
 
 ```c
 a)  for (i = 1; i <= n; i++)  suma += tab[i];
+Błąd - i = 1 oraz i <= n
+Poprawienie - for (i = 0; i < n; i++) suma += tab[i];
 
 b)  int maks = 0;
     for (i = 0; i < n; i++)  if (tab[i] > maks) maks = tab[i];
+Błąd - Inicjalizacja maks = 0
+Poprawienie - int maks = tab[0]; for (i = 1; i < n; i++) ...
 
 c)  for (i = 0; i < n; i++)  tab[i] = tab[i+1];   // przesunięcie w lewo
+Błąd - Wyjście poza zakres przez tab[i+1]
+Poprawienie - for (i = 0; i < n - 1; i++) tab[i] = tab[i+1];
 ```
 
 ### Ćwiczenie 1.5 – Tablica dwuwymiarowa
@@ -77,12 +108,26 @@ c)  for (i = 0; i < n; i++)  tab[i] = tab[i+1];   // przesunięcie w lewo
 Dana jest macierz `int m[3][4]` wypełniona kolejnymi liczbami od 1 do 12 (wierszami).
 
 ```
-a)  m[0][0] = ______      c)  m[2][3] = ______
-b)  m[1][2] = ______      d)  m[2][0] = ______
+a)  m[0][0] = 1      c)  m[2][3] = 12
+b)  m[1][2] = 7      d)  m[2][0] = 9
 ```
 
 **e)** Napisz podwójną pętlę wypisującą sumę każdego wiersza osobno.
+for (int i = 0; i < 3; i++) 
+    {
+    int suma_wiersza = 0;
+    for (int j = 0; j < 4; j++)
+    {
+        suma_wiersza += m[i][j];
+    }
+    printf("Suma wiersza %d wynosi: %d\n", i, suma_wiersza);
+}
 **f)** Napisz pętlę liczącą sumę elementów na przekątnej macierzy kwadratowej.
+int suma_przekatnej = 0;
+for (int i = 0; i < N; i++) 
+    {
+    suma_przekatnej += m[i][i];
+    }
 
 ### Ćwiczenie 1.6 – Układ w pamięci
 
@@ -94,12 +139,44 @@ Macierz 2 × 3 zawiera wartości:
 ```
 
 **a)** Zapisz kolejność bajtów przy układzie wierszami.
+7, 8, 9, 1, 2, 3
 **b)** Zapisz kolejność przy układzie kolumnami.
+7, 1, 8, 2, 9, 3
 **c)** Który układ stosuje język C, a który Fortran?
+- Układ wierszami (Row-major) stosuje język C (oraz C++, Java, Python).
+- Układ kolumnami (Column-major) stosuje Fortran (oraz MATLAB, R).
 
 ### Ćwiczenie 1.7 [K] – Szachownica
 
 Napisz program wypisujący szachownicę 8 × 8 złożoną ze znaków `#` i `.`, używając tablicy dwuwymiarowej i warunku na sumie indeksów.
+
+int main()
+    {
+    char szachownica[8][8];
+    for (int i = 0; i < 8; i++)
+        {
+        for (int j = 0; j < 8; j++)
+            {
+            if ((i + j) % 2 == 0)
+                {
+                szachownica[i][j] = '#';
+                }
+                else
+                {
+                szachownica[i][j] = '.';
+                }
+            }
+        }
+    for (int i = 0; i < 8; i++)
+        {
+        for (int j = 0; j < 8; j++)
+            {
+            printf("%c ", szachownica[i][j]);
+            }
+        printf("\n"); 
+        }
+    return 0;
+}
 
 ---
 
@@ -111,11 +188,11 @@ Tablica dynamiczna startuje z pojemnością 2 i podwaja ją po zapełnieniu. Uzu
 
 | Po dodaniu elementu nr | Rozmiar | Pojemność | Czy nastąpiło przepisanie? |
 |---|---|---|---|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 5 | | | |
-| 9 | | | |
+| 1 | 1 | 2 | Nie |
+| 2 | 2 | 2 | Nie |
+| 3 | 3 | 4 | Tak |
+| 5 | 5 | 8 | Tak |
+| 9 | 9 | 9 | Tak |
 
 ### Ćwiczenie 2.2 – Nazwy w językach
 
@@ -123,10 +200,10 @@ Uzupełnij tabelę.
 
 | Język | Typ tablicy dynamicznej | Dodanie na koniec | Odczyt rozmiaru |
 |---|---|---|---|
-| Python | | | |
-| Java | | | |
-| C++ | | | |
-| C# | | | |
+| Python | list | .append(x) | len(lista) |
+| Java | ArrayList<T> | .add(x) | .size() |
+| C++ | std::vector<T> | .push_back(x) | .size() |
+| C# | List<T> | .Add(x) | .Count |
 
 ### Ćwiczenie 2.3 – Tablica czy słownik
 
@@ -134,12 +211,12 @@ Dla każdego zastosowania wybierz strukturę i uzasadnij jednym zdaniem.
 
 | Dane | Struktura | Uzasadnienie |
 |---|---|---|
-| Oceny ucznia w kolejności wystawiania | | |
-| Liczba mieszkańców według nazwy miasta | | |
-| Kolejka zgłoszeń do rozpatrzenia | | |
-| Ustawienia programu (nazwa opcji i wartość) | | |
-| Lista zakupów do odhaczania | | |
-| Liczba wystąpień każdego słowa w tekście | | |
+| Oceny ucznia w kolejności wystawiania | Tablica / Lista dynamiczna | Kluczowa jest chronologia i możliwość powtarzania się takich samych ocen, co idealnie obsługuje lista. |
+| Liczba mieszkańców według nazwy miasta | Słownik (Map) | Pozwala na błyskawiczne wyszukiwanie liczby mieszkańców, używając unikalnej nazwy miasta jako klucza. |
+| Kolejka zgłoszeń do rozpatrzenia | Kolejka (Queue) | Zapewnia obsługę zgłoszeń w sprawiedliwej kolejności ich napływania według zasady FIFO (pierwszy na wejściu, pierwszy na wyjściu). |
+| Ustawienia programu (nazwa opcji i wartość) | Słownik (Map) | Idealnie mapuje unikalny klucz (nazwę konfiguracji) na przypisaną mu wartość (np. {"motyw": "ciemny"}). |
+| Lista zakupów do odhaczania | Tablica / Lista dynamiczna | Stanowi prosty, uporządkowany zbiór elementów do sekwencyjnego przeglądania i wykreślania. |
+| Liczba wystąpień każdego słowa w tekście | Słownik (Map) | Umożliwia zliczanie poprzez powiązanie unikalnego słowa (klucz) z aktualną liczbą jego powtórzeń (wartość). |
 
 ### Ćwiczenie 2.4 – Operacje na słowniku
 
@@ -153,11 +230,20 @@ Zapisz w Pythonie:
 
 ```
 a)  dodanie pozycji "gwozdzie" z wartością 200
+magazyn["gwozdzie"] = 200
 b)  zwiększenie liczby śrubek o 30
+magazyn["srubki"] += 30
 c)  sprawdzenie, czy w magazynie są wkręty
+if "wkrety" in magazyn:
+    print("Są w magazynie")
 d)  usunięcie pozycji "podkladki"
+del magazyn["podkladki"]
 e)  wypisanie wszystkich pozycji z wartością mniejszą niż 100
+for produkt, ilosc in magazyn.items():
+    if ilosc < 100:
+        print(f"{produkt}: {ilosc}")
 f)  policzenie łącznej liczby elementów w magazynie
+laczna_suma = sum(magazyn.values())
 ```
 
 ### Ćwiczenie 2.5 – Klucz czy nie klucz
@@ -165,17 +251,32 @@ f)  policzenie łącznej liczby elementów w magazynie
 Rozstrzygnij, czy dana może być kluczem słownika. Odpowiedź uzasadnij.
 
 ```
-a)  numer PESEL                          ___
-b)  imię ucznia                          ___
-c)  lista ocen                           ___
-d)  adres e-mail                         ___
-e)  data i godzina pomiaru               ___
-f)  obiekt, którego pola zmieniają się w trakcie    ___
+a)  numer PESEL                          Tak - Jest unikalny dla każdej osoby i niezmienny (jest ciągiem znaków lub liczbą), co czyni go idealnym kluczem.
+b)  imię ucznia                          Nie - • Imiona nie są unikalne – w jednej grupie lub szkole może być wielu uczniów o imieniu „Jan”, co doprowadziłoby do nadpisania danych.
+c)  lista ocen                           NIE - Lista jest strukturą modyfikowalną (mutable); zmiana ocen zmieniłaby jej zawartość, co uniemożliwia prawidłowe wyznaczenie kodu hash i odnalezienie elementu w pamięci.
+d)  adres e-mail                         Tak - Adresy e-mail są unikalne w skali globalnej oraz są zapisywane jako niezmienne ciągi tekstowe (stringi).
+e)  data i godzina pomiaru               Tak - Obiekty daty i czasu (lub ich reprezentacje tekstowe/liczbowe) są niezmienne, a w systemach pomiarowych czas (np. timestamp) często służy jako unikalny identyfikator wpisu.
+f)  obiekt, którego pola zmieniają się w trakcie    Nie - • Klucz słownika musi być niezmienny (immutable); jeśli pola obiektu się zmienią, zmieni się też jego funkcja skrótu (hash), przez co słownik „zgubi” ten obiekt i nie będzie można go wyszukać.
 ```
 
 ### Ćwiczenie 2.6 [K] – Licznik słów
 
 Napisz program, który dla podanego zdania policzy, ile razy wystąpiło każde słowo, i wypisze wynik. Użyj słownika. Wyjaśnij, dlaczego lista byłaby tu gorszym wyborem.
+
+def licznik_slow(zdanie):
+    slowa = zdanie.lower().replace(".", "").replace(",", "").split()
+    slownik_slow = {}
+    for slowo in slowa:
+        if slowo in slownik_slow:
+            slownik_slow[slowo] += 1
+        else:
+            slownik_slow[slowo] = 1
+    for slowo, ilosc in slownik_slow.items():
+        print(f"Słowo '{slowo}' wystąpiło: {ilosc} razy")
+
+tekst = "Kot goni mysz, a inny kot śpi. Mysz ucieka."
+licznik_slow(tekst)
+
 
 ---
 
