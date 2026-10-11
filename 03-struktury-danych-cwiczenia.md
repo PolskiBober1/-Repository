@@ -288,11 +288,11 @@ Zaprojektuj rekord opisujący **książkę w bibliotece**. Dla każdego pola pod
 
 | Pole | Typ | Uzasadnienie |
 |---|---|---|
-| | | |
-| | | |
-| | | |
-| | | |
-| | | |
+| id | int | Unikalny numer identyfikacyjny egzemplarza w systemie bibliotecznym. |
+| tytul | string | Przechowuje pełną nazwę książki, która składa się z liter i znaków. |
+| rok_wydania | int | Rok opublikowania książki, reprezentowany jako standardowa liczba (np. 2024). |
+| cena | float/double | Wartość rynkowa książki w celach kaucji lub odszkodowań, wymagająca części ułamkowej (groszy).|
+| czy_wypozyczona | boolean | Flaga określająca aktualny status książki (true – wypożyczona, false – dostępna na półce). |
 
 Minimum pięć pól. Uwzględnij co najmniej jedno pole logiczne.
 
@@ -307,24 +307,39 @@ float pensja[100];
 ```
 
 **a)** Wymień dwa problemy, jakie niesie takie rozwiązanie.
+1. 1. Trudność w utrzymaniu spójności danych: Podczas sortowania, usuwania lub dodawania pracownika należy zmodyfikować wszystkie trzy tablice dokładnie pod tym samym indeksem. Pomyłka w jednej tablicy całkowicie wymiesza dane (np. przypisze cudzy wiek lub pensję do nazwiska).
+2. Słaba czytelność i skalowalność kodu: Kod staje się skomplikowany, ponieważ jedna logiczna encja (pracownik) jest rozbita na wiele niezależnych struktur. Dodanie nowego atrybutu wymaga tworzenia kolejnej tablicy i przekazywania wielu argumentów do funkcji.
 **b)** Przepisz to z użyciem struktury i tablicy rekordów.
+struct Pracownik {
+    char nazwisko[40];
+    int wiek;
+    float pensja;
+};
+struct Pracownik pracownicy[100];
 **c)** Napisz pętlę wypisującą nazwiska osób zarabiających powyżej 5000.
+for (int i = 0; i < 100; i++) {
+    if (pracownicy[i].pensja > 5000.0) {
+        printf("%s\n", pracownicy[i].nazwisko);
+    }
+}
 
 ### Ćwiczenie 3.3 – Rozmiar struktury
 
 Oblicz rozmiar każdej struktury, zakładając: `char` 1 bajt, `int` 4 bajty, `double` 8 bajtów, wyrównanie do rozmiaru największego pola.
 
 ```c
-a)  struct A { int x; int y; };                 = ______
+a)  struct A { int x; int y; };                 = 8 bajtów (4 + 4)
 
-b)  struct B { char c; int x; };                = ______
+b)  struct B { char c; int x; };                = 8 bajtów (1 + 3 bajty wyrównania + 4)
 
-c)  struct C { char c; char d; int x; };        = ______
+c)  struct C { char c; char d; int x; };        = 8 bajtów (1 + 1 + 2 bajty wyrównania + 4)
 
-d)  union  D { int x; double y; char c[4]; };   = ______
+d)  union  D { int x; double y; char c[4]; };   = • 8 bajtów (największy rozmiar w unii ma double)
 ```
 
 Wyjaśnij, dlaczego wynik w podpunkcie `b` nie wynosi 5.
+1. Wymóg procesora: Nowoczesne procesory odczytują dane z pamięci w blokach (np. 4 lub 8-bajtowych). Aby odczyt zmiennej typu int (4 bajty) był szybki i odbywał się w jednym cyklu zegara, jej adres w pamięci musi być wielokrotnością jej rozmiaru (czyli podzielny przez 4).
+2. Działanie kompilatora: Zmienna char c zajmuje 1 bajt (offset 0). Gdyby kompilator umieścił int x od razu za nią (offset 1), adres nie byłby podzielny przez 4. Dlatego kompilator wstawia 3 bajty puste (padding) jako sztuczne dopełnienie. Zmienna x ląduje na bezpiecznym offsecie 4, a cała struktura zamiast 5 bajtów zajmuje 8.
 
 ### Ćwiczenie 3.4 – Rekord zagnieżdżony
 
@@ -334,21 +349,76 @@ Zaprojektuj strukturę `Zamowienie`, która zawiera:
 - dane klienta (nazwa, adres rozbity na ulicę, miasto i kod pocztowy),
 - datę złożenia (dzień, miesiąc, rok),
 - wartość zamówienia.
+struct Adres {
+    char ulica[50];
+    char miasto[40];
+    char kod_pocztowy[10];
+};
+
+struct Klient {
+    char nazwa[60];
+    struct Adres adres;
+};
+
+struct Data {
+    int dzien;
+    int miesiac;
+    int rok;
+};
+
+struct Zamowienie {
+    int numer_zamowienia;
+    struct Klient klient;
+    struct Data data_zlozenia;
+    double wartosc_zamowienia;
+};
 
 Zapisz definicję w dowolnej składni i pokaż, jak odwołać się do miasta klienta.
+struct Zamowienie moje_zamowienie;
+
+printf("Miasto klienta to: %s\n", moje_zamowienie.klient.adres.miasto);
 
 ### Ćwiczenie 3.5 – Struktura a unia
 
 Odpowiedz:
 
 **a)** Czym różni się rozmiar struktury od rozmiaru unii o tych samych polach?
+Rozmiar struktury to suma rozmiarów jej wszystkich pól wraz z bajtami dopełnienia (paddingu). Wszystkie pola istnieją w pamięci obok siebie. Rozmiar unii jest równy rozmiarowi jej największego pojedynczego pola (plus ewentualne wyrównanie). Wszystkie pola unii współdzielą ten sam obszar pamięci.
+
 **b)** Ile pól unii ma sensowną wartość w danej chwili?
+W danej chwili sensowną wartość ma dokładnie jedno pole unii — to, które zostało zapisane jako ostatnie. Zapisanie wartości do innego pola nadpisuje poprzednie dane.
+
 **c)** Po co stosuje się pole rozpoznawcze?
+Pole rozpoznawcze (tzw. tag lub discriminator) stosuje się poza unią (najczęściej w strukturze nadrzędnej), aby program wiedział, które pole unii jest aktualnie używane. Zapobiega to błędnemu odczytaniu danych (np. próbie odczytania liczby zmiennopozycyjnej jako tekstu).
+
 **d)** Podaj jedno praktyczne zastosowanie unii.
+• Praktyczne zastosowanie unii: Reprezentacja wariantowa danych (rekordy z wariantami). Przykładowo, w kompilatorach lub parserach unia pozwala przechowywać wartość tokenu, który zależnie od typu może być liczbą całkowitą, liczbą zmiennopozycyjną lub wskaźnikiem na tekst, bez marnowania pamięci na wszystkie te trzy opcje naraz. Druga popularna opcja to dostęp niskopoziomowy do składowych (np. odczytywanie 4-bajtowej liczby int jako tablicy czterech pojedynczych bajtów char[4]).
+
 
 ### Ćwiczenie 3.6 – Zaprojektuj unię z polem rozpoznawczym
 
 Program przechowuje wynik pomiaru, który może być liczbą całkowitą, liczbą rzeczywistą albo komunikatem błędu. Zaprojektuj strukturę z unią i polem rozpoznawczym oraz napisz warunek wypisujący wartość we właściwy sposób.
+
+#include <stdio.h>
+
+typedef enum
+    {
+    TYP_INT,
+    TYP_FLOAT,
+    TYP_BLAD
+    } TypPomiaru;
+
+struct Pomiar
+    {
+    TypPomiaru typ;
+    
+    union
+        {
+        int wartosc_int;
+        float wartosc_float;
+        char komunikat_bledu[50];
+        } dane;
+};
 
 ---
 
